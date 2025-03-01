@@ -1,11 +1,13 @@
 from htmlnode import *
+from enum import Enum
 
-block_type_paragraph = "paragraph"
-block_type_heading = "heading"
-block_type_code = "code"
-block_type_quote = "quote"
-block_type_olist = "ordered_list"
-block_type_ulist = "unordered_list"
+class BlockType(Enum):
+    PARAGRAPH = "paragraph"
+    HEADING = "heading"
+    CODE = "code"
+    QUOTE = "quote"
+    OLIST = "ordered_list"
+    ULIST = "unordered_list"
 
 def markdown_to_blocks(markdown):
     blocks = list(map(lambda block: block.strip(), markdown.split("\n\n")))
@@ -17,16 +19,16 @@ def markdown_to_blocks(markdown):
 def block_to_block_type(block):
     lines = block.split("\n")
     if block.startswith(("# ", "## ", "### ", "#### ", "##### ", "###### ")):
-        return block_type_heading
+        return BlockType.HEADING
     if block.startswith("```") and block.endswith("```"):
-        return block_type_code
+        return BlockType.CODE
     if line_count(lines, ">") == len(lines):
-        return block_type_quote
+        return BlockType.QUOTE
     if line_count(lines, "* ", "- ") == len(lines):
-        return block_type_ulist
-    if line_count(lines) == len(lines):
-        return block_type_olist
-    return block_type_paragraph
+        return BlockType.ULIST
+    if line_count(lines) == len(lines) and not block.startswith("!["):
+        return BlockType.OLIST
+    return BlockType.PARAGRAPH
 
 def line_count(lines, mark0=None, mark1=None):
     count = 0
@@ -44,20 +46,20 @@ def line_count(lines, mark0=None, mark1=None):
     return count
 
 def block_to_html_node(children, block_type):
-    if block_type == block_type_paragraph:
+    if block_type == BlockType.PARAGRAPH:
         return ParentNode("p", children)
-    if block_type == block_type_heading:
+    if block_type == BlockType.HEADING:
         text_list = children[0].value.split(" ")
         count = len(text_list[0])
         children[0].value = " ".join(text_list[1:])
         return ParentNode(f"h{count}", children)
-    if block_type == block_type_code:
+    if block_type == BlockType.CODE:
         code_block = ParentNode("code", children)
         return ParentNode("pre", [code_block])
-    if block_type == block_type_quote:
+    if block_type == BlockType.QUOTE:
         return ParentNode("blockquote", children)
-    if block_type == block_type_olist:
+    if block_type == BlockType.OLIST:
         return ParentNode("ol", children)
-    if block_type == block_type_ulist:
+    if block_type == BlockType.ULIST:
         return ParentNode("ul", children)
     return children

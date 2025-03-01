@@ -18,6 +18,7 @@ def main():
 def copy_files(src, pth):
     if not os.path.exists(pth):
         os.mkdir(pth)
+    
     for src_file in os.listdir(src):
         file_path = os.path.join(src, src_file)
         dest_path = os.path.join(pth, src_file)

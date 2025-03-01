@@ -105,39 +105,39 @@ class Test(unittest.TestCase):
         )
 
     def test_eq(self):
-        node = TextNode("This is a text node", text_type_text)
-        node2 = TextNode("This is a text node", text_type_text)
+        node = TextNode("This is a text node", TextType.TEXT)
+        node2 = TextNode("This is a text node", TextType.TEXT)
         self.assertEqual(node, node2)
 
     def test_eq_false(self):
-        node = TextNode("This is a text node", text_type_text)
-        node2 = TextNode("This is a text node", text_type_bold)
+        node = TextNode("This is a text node", TextType.TEXT)
+        node2 = TextNode("This is a text node", TextType.BOLD)
         self.assertNotEqual(node, node2)
 
     def test_eq_false2(self):
-        node = TextNode("This is a text node", text_type_text)
-        node2 = TextNode("This is a text node2", text_type_text)
+        node = TextNode("This is a text node", TextType.TEXT)
+        node2 = TextNode("This is a text node2", TextType.TEXT)
         self.assertNotEqual(node, node2)
 
     def test_eq_url(self):
-        node = TextNode("This is a text node", text_type_text, "https://www.boot.dev")
-        node2 = TextNode("This is a text node", text_type_text, "https://www.boot.dev")
+        node = TextNode("This is a text node", TextType.TEXT, "https://www.boot.dev")
+        node2 = TextNode("This is a text node", TextType.TEXT, "https://www.boot.dev")
         self.assertEqual(node, node2)
 
     def test_repr(self):
-        node = TextNode("This is a text node", text_type_text, "https://www.boot.dev")
+        node = TextNode("This is a text node", TextType.TEXT, "https://www.boot.dev")
         self.assertEqual(
-            "TextNode(This is a text node, text, https://www.boot.dev)", repr(node)
+            "TextNode(This is a text node, TextType.TEXT, https://www.boot.dev)", repr(node)
         )
 
     def test_text(self):
-        node = TextNode("This is a text node", text_type_text)
+        node = TextNode("This is a text node", TextType.TEXT)
         html_node = text_node_to_html_node(node)
         self.assertEqual(html_node.tag, None)
         self.assertEqual(html_node.value, "This is a text node")
 
     def test_image(self):
-        node = TextNode("This is an image", text_type_image, "https://www.boot.dev")
+        node = TextNode("This is an image", TextType.IMAGE, "https://www.boot.dev")
         html_node = text_node_to_html_node(node)
         self.assertEqual(html_node.tag, "img")
         self.assertEqual(html_node.value, "")
@@ -147,61 +147,61 @@ class Test(unittest.TestCase):
         )
 
     def test_bold(self):
-        node = TextNode("This is bold", text_type_bold)
+        node = TextNode("This is bold", TextType.BOLD)
         html_node = text_node_to_html_node(node)
         self.assertEqual(html_node.tag, "b")
         self.assertEqual(html_node.value, "This is bold")
 
     def test_delim_bold(self):
-        node = TextNode("This is text with a **bolded** word", text_type_text)
-        new_nodes = split_nodes_delimiter([node], "**", text_type_bold)
+        node = TextNode("This is text with a **bolded** word", TextType.TEXT)
+        new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
         self.assertListEqual(
             [
-                TextNode("This is text with a ", text_type_text),
-                TextNode("bolded", text_type_bold),
-                TextNode(" word", text_type_text),
+                TextNode("This is text with a ", TextType.TEXT),
+                TextNode("bolded", TextType.BOLD),
+                TextNode(" word", TextType.TEXT),
             ],
             new_nodes,
         )
 
     def test_delim_bold_double(self):
         node = TextNode(
-            "This is text with a **bolded** word and **another**", text_type_text
+            "This is text with a **bolded** word and **another**", TextType.TEXT
         )
-        new_nodes = split_nodes_delimiter([node], "**", text_type_bold)
+        new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
         self.assertListEqual(
             [
-                TextNode("This is text with a ", text_type_text),
-                TextNode("bolded", text_type_bold),
-                TextNode(" word and ", text_type_text),
-                TextNode("another", text_type_bold),
+                TextNode("This is text with a ", TextType.TEXT),
+                TextNode("bolded", TextType.BOLD),
+                TextNode(" word and ", TextType.TEXT),
+                TextNode("another", TextType.BOLD),
             ],
             new_nodes,
         )
 
     def test_delim_bold_multiword(self):
         node = TextNode(
-            "This is text with a **bolded word** and **another**", text_type_text
+            "This is text with a **bolded word** and **another**", TextType.TEXT
         )
-        new_nodes = split_nodes_delimiter([node], "**", text_type_bold)
+        new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
         self.assertListEqual(
             [
-                TextNode("This is text with a ", text_type_text),
-                TextNode("bolded word", text_type_bold),
-                TextNode(" and ", text_type_text),
-                TextNode("another", text_type_bold),
+                TextNode("This is text with a ", TextType.TEXT),
+                TextNode("bolded word", TextType.BOLD),
+                TextNode(" and ", TextType.TEXT),
+                TextNode("another", TextType.BOLD),
             ],
             new_nodes,
         )
 
     def test_delim_italic(self):
-        node = TextNode("This is text with an *italic* word", text_type_text)
-        new_nodes = split_nodes_delimiter([node], "*", text_type_italic)
+        node = TextNode("This is text with an *italic* word", TextType.TEXT)
+        new_nodes = split_nodes_delimiter([node], "*", TextType.ITALIC)
         self.assertListEqual(
             [
-                TextNode("This is text with an ", text_type_text),
-                TextNode("italic", text_type_italic),
-                TextNode(" word", text_type_text),
+                TextNode("This is text with an ", TextType.TEXT),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(" word", TextType.TEXT),
             ],
             new_nodes,
         )
@@ -212,16 +212,16 @@ class Test(unittest.TestCase):
         )
         self.assertListEqual(
             [
-                TextNode("This is ", text_type_text),
-                TextNode("text", text_type_bold),
-                TextNode(" with an ", text_type_text),
-                TextNode("italic", text_type_italic),
-                TextNode(" word and a ", text_type_text),
-                TextNode("code block", text_type_code),
-                TextNode(" and an ", text_type_text),
-                TextNode("image", text_type_image, "https://i.imgur.com/zjjcJKZ.png"),
-                TextNode(" and a ", text_type_text),
-                TextNode("link", text_type_link, "https://boot.dev"),
+                TextNode("This is ", TextType.TEXT),
+                TextNode("text", TextType.BOLD),
+                TextNode(" with an ", TextType.TEXT),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(" word and a ", TextType.TEXT),
+                TextNode("code block", TextType.CODE),
+                TextNode(" and an ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and a ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://boot.dev"),
             ],
             nodes,
         )
@@ -271,17 +271,17 @@ This is the same paragraph on a new line
 
     def test_block_to_block_types(self):
         block = "# heading"
-        self.assertEqual(block_to_block_type(block), block_type_heading)
+        self.assertEqual(block_to_block_type(block), BlockType.HEADING)
         block = "```\ncode\n```"
-        self.assertEqual(block_to_block_type(block), block_type_code)
+        self.assertEqual(block_to_block_type(block), BlockType.CODE)
         block = "> quote\n> more quote"
-        self.assertEqual(block_to_block_type(block), block_type_quote)
+        self.assertEqual(block_to_block_type(block), BlockType.QUOTE)
         block = "* list\n* items"
-        self.assertEqual(block_to_block_type(block), block_type_ulist)
+        self.assertEqual(block_to_block_type(block), BlockType.ULIST)
         block = "1. list\n2. items"
-        self.assertEqual(block_to_block_type(block), block_type_olist)
+        self.assertEqual(block_to_block_type(block), BlockType.OLIST)
         block = "paragraph"
-        self.assertEqual(block_to_block_type(block), block_type_paragraph)
+        self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
 
     def test_paragraph(self):
         md = """
