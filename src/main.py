@@ -2,20 +2,29 @@ from textnode import *
 from markdown import *
 import os
 import shutil
+import sys
 
 source = "./static"
-destination = "./public"
+destination = "./docs"
 markdown = "./content"
 template = "./template.html"
-html_path = "./public"
 
 def main():
+    args = sys.argv
+    global basePath
+    basePath = "/"
+    if len(args) == 2:
+        basePath = args[1]
+
     if os.path.exists(destination):
-        shutil.rmtree(destination)        
+        shutil.rmtree(destination)
+    
     copy_files(source, destination)
-    generate_pages_recursive(markdown, template, html_path)
+    generate_pages_recursive(markdown, template, destination)
 
 def copy_files(src, pth):
+    print(f"Copying from {src} to {pth}")
+    pth = pth
     if not os.path.exists(pth):
         os.mkdir(pth)
     
@@ -36,6 +45,7 @@ def generate_page(from_path, template_path, dest_path):
     html = markdown_to_html(md)
     title = extract_title(md)
     result = tmp.replace("{{ Title }}", title).replace("{{ Content }}", html)
+    result = result.replace('href="/', f'href="{basePath}').replace('src="/', f'src="{basePath}')
     dest_dir_path = os.path.dirname(dest_path)
     if not os.path.exists(dest_dir_path):
         os.makedirs(dest_dir_path)
